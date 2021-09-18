@@ -16,6 +16,16 @@ namespace YoutubeDownloader.Behaviors
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,
                     OnSelectedItemsChanged));
 
+        private bool _modelHandled;
+
+        private bool _viewHandled;
+
+        public IList? SelectedItems
+        {
+            get => (IList?) GetValue(SelectedItemsProperty);
+            set => SetValue(SelectedItemsProperty, value);
+        }
+
         private static void OnSelectedItemsChanged(DependencyObject sender, DependencyPropertyChangedEventArgs args)
         {
             var behavior = (VideoMultiSelectionListBoxBehavior) sender;
@@ -29,15 +39,6 @@ namespace YoutubeDownloader.Behaviors
             behavior._modelHandled = false;
         }
 
-        private bool _viewHandled;
-        private bool _modelHandled;
-
-        public IList? SelectedItems
-        {
-            get => (IList?) GetValue(SelectedItemsProperty);
-            set => SetValue(SelectedItemsProperty, value);
-        }
-
         // Propagate selected items from model to view
         private void SelectItems()
         {
@@ -45,10 +46,8 @@ namespace YoutubeDownloader.Behaviors
 
             AssociatedObject.SelectedItems.Clear();
             if (SelectedItems is not null)
-            {
                 foreach (var item in SelectedItems)
                     AssociatedObject.SelectedItems.Add(item);
-            }
 
             _viewHandled = false;
         }

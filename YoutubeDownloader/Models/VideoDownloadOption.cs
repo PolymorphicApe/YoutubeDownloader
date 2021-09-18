@@ -33,9 +33,14 @@ namespace YoutubeDownloader.Models
             string format,
             string label,
             params IStreamInfo[] streamInfos)
-            : this(format, label, (IReadOnlyList<IStreamInfo>) streamInfos) {}
+            : this(format, label, (IReadOnlyList<IStreamInfo>) streamInfos)
+        {
+        }
 
-        public override string ToString() => $"{Label} / {Format}";
+        public override string ToString()
+        {
+            return $"{Label} / {Format}";
+        }
     }
 
     public partial class VideoDownloadOption : IEquatable<VideoDownloadOption>
@@ -59,9 +64,12 @@ namespace YoutubeDownloader.Models
             return Equals((VideoDownloadOption) obj);
         }
 
-        public override int GetHashCode() => HashCode.Combine(
-            StringComparer.OrdinalIgnoreCase.GetHashCode(Format),
-            StringComparer.OrdinalIgnoreCase.GetHashCode(Label)
-        );
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                StringComparer.OrdinalIgnoreCase.GetHashCode(Format),
+                StringComparer.OrdinalIgnoreCase.GetHashCode(Label)
+            );
+        }
     }
 }

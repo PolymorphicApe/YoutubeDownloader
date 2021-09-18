@@ -16,11 +16,11 @@ namespace YoutubeDownloader.ViewModels.Components
 {
     public class DownloadViewModel : PropertyChangedBase
     {
-        private readonly IViewModelFactory _viewModelFactory;
         private readonly DialogManager _dialogManager;
-        private readonly SettingsService _settingsService;
         private readonly DownloadService _downloadService;
+        private readonly SettingsService _settingsService;
         private readonly TaggingService _taggingService;
+        private readonly IViewModelFactory _viewModelFactory;
 
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -52,6 +52,16 @@ namespace YoutubeDownloader.ViewModels.Components
 
         public string? FailReason { get; private set; }
 
+        public bool CanStart => !IsActive;
+
+        public bool CanCancel => IsActive && !IsCanceled;
+
+        public bool CanShowFile => IsSuccessful;
+
+        public bool CanOpenFile => IsSuccessful;
+
+        public bool CanRestart => CanStart && !IsSuccessful;
+
         public DownloadViewModel(
             IViewModelFactory viewModelFactory,
             DialogManager dialogManager,
@@ -65,8 +75,6 @@ namespace YoutubeDownloader.ViewModels.Components
             _downloadService = downloadService;
             _taggingService = taggingService;
         }
-
-        public bool CanStart => !IsActive;
 
         public void Start()
         {
@@ -105,14 +113,12 @@ namespace YoutubeDownloader.ViewModels.Components
                     );
 
                     if (_settingsService.ShouldInjectTags)
-                    {
                         await _taggingService.InjectTagsAsync(
                             Video,
                             Format,
                             FilePath,
                             _cancellationTokenSource.Token
                         );
-                    }
 
                     IsSuccessful = true;
                 }
@@ -139,8 +145,6 @@ namespace YoutubeDownloader.ViewModels.Components
             });
         }
 
-        public bool CanCancel => IsActive && !IsCanceled;
-
         public void Cancel()
         {
             if (!CanCancel)
@@ -148,8 +152,6 @@ namespace YoutubeDownloader.ViewModels.Components
 
             _cancellationTokenSource?.Cancel();
         }
-
-        public bool CanShowFile => IsSuccessful;
 
         public async void ShowFile()
         {
@@ -168,8 +170,6 @@ namespace YoutubeDownloader.ViewModels.Components
             }
         }
 
-        public bool CanOpenFile => IsSuccessful;
-
         public async void OpenFile()
         {
             if (!CanOpenFile)
@@ -186,9 +186,10 @@ namespace YoutubeDownloader.ViewModels.Components
             }
         }
 
-        public bool CanRestart => CanStart && !IsSuccessful;
-
-        public void Restart() => Start();
+        public void Restart()
+        {
+            Start();
+        }
     }
 
     public static class DownloadViewModelExtensions

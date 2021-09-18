@@ -27,7 +27,7 @@ namespace YoutubeDownloader.Services
 
         private async Task MaintainRateLimitAsync(
             TimeSpan interval,
-            CancellationToken cancellationToken =default)
+            CancellationToken cancellationToken = default)
         {
             // Gain lock
             await _requestRateSemaphore.WaitAsync(cancellationToken);
@@ -63,7 +63,8 @@ namespace YoutubeDownloader.Services
                 // 4 requests per second
                 await MaintainRateLimitAsync(TimeSpan.FromSeconds(1.0 / 4), cancellationToken);
 
-                using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                using var response =
+                    await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
                 if (!response.IsSuccessStatusCode)
                     return null;
@@ -203,15 +204,11 @@ namespace YoutubeDownloader.Services
             CancellationToken cancellationToken = default)
         {
             if (string.Equals(format, "mp4", StringComparison.OrdinalIgnoreCase))
-            {
                 await InjectVideoTagsAsync(video, filePath, cancellationToken);
-            }
             else if (
                 string.Equals(format, "mp3", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(format, "ogg", StringComparison.OrdinalIgnoreCase))
-            {
                 await InjectAudioTagsAsync(video, filePath, cancellationToken);
-            }
 
             // Other formats are not supported for tagging
         }

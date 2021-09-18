@@ -17,12 +17,12 @@ namespace YoutubeDownloader.ViewModels
 {
     public class RootViewModel : Screen
     {
-        private readonly IViewModelFactory _viewModelFactory;
         private readonly DialogManager _dialogManager;
+        private readonly DownloadService _downloadService;
+        private readonly QueryService _queryService;
         private readonly SettingsService _settingsService;
         private readonly UpdateService _updateService;
-        private readonly QueryService _queryService;
-        private readonly DownloadService _downloadService;
+        private readonly IViewModelFactory _viewModelFactory;
 
         public ISnackbarMessageQueue Notifications { get; } = new SnackbarMessageQueue(TimeSpan.FromSeconds(5));
 
@@ -35,6 +35,10 @@ namespace YoutubeDownloader.ViewModels
         public string? Query { get; set; }
 
         public BindableCollection<DownloadViewModel> Downloads { get; } = new();
+
+        public bool CanShowSettings => !IsBusy;
+
+        public bool CanProcessQuery => !IsBusy && !string.IsNullOrWhiteSpace(Query);
 
         public RootViewModel(IViewModelFactory viewModelFactory, DialogManager dialogManager,
             SettingsService settingsService, UpdateService updateService, QueryService queryService,
@@ -98,13 +102,9 @@ namespace YoutubeDownloader.ViewModels
             _settingsService.Load();
 
             if (_settingsService.IsDarkModeEnabled)
-            {
                 App.SetDarkTheme();
-            }
             else
-            {
                 App.SetLightTheme();
-            }
 
             await CheckForUpdatesAsync();
         }
@@ -121,8 +121,6 @@ namespace YoutubeDownloader.ViewModels
 
             _updateService.FinalizeUpdate(false);
         }
-
-        public bool CanShowSettings => !IsBusy;
 
         public async void ShowSettings()
         {
@@ -146,8 +144,6 @@ namespace YoutubeDownloader.ViewModels
 
             Downloads.Insert(0, download);
         }
-
-        public bool CanProcessQuery => !IsBusy && !string.IsNullOrWhiteSpace(Query);
 
         public async void ProcessQuery()
         {
@@ -245,11 +241,15 @@ namespace YoutubeDownloader.ViewModels
             Downloads.Remove(download);
         }
 
-        public void RemoveInactiveDownloads() =>
+        public void RemoveInactiveDownloads()
+        {
             Downloads.RemoveWhere(d => !d.IsActive);
+        }
 
-        public void RemoveSuccessfulDownloads() =>
+        public void RemoveSuccessfulDownloads()
+        {
             Downloads.RemoveWhere(d => d.IsSuccessful);
+        }
 
         public void RestartFailedDownloads()
         {

@@ -12,7 +12,10 @@ namespace YoutubeDownloader.Models
             TrackInfo = trackInfo;
         }
 
-        public override string ToString() => TrackInfo.Language.ToString();
+        public override string ToString()
+        {
+            return TrackInfo.Language.ToString();
+        }
     }
 
     public partial class SubtitleDownloadOption : IEquatable<SubtitleDownloadOption>
@@ -20,20 +23,19 @@ namespace YoutubeDownloader.Models
         public bool Equals(SubtitleDownloadOption? other)
         {
             if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-
-            return StringComparer.Ordinal.Equals(TrackInfo.Url, other.TrackInfo.Url);
+            return ReferenceEquals(this, other) || StringComparer.Ordinal.Equals(TrackInfo.Url, other.TrackInfo.Url);
         }
 
         public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-
-            return Equals((SubtitleDownloadOption) obj);
+            return obj.GetType() == GetType() && Equals((SubtitleDownloadOption) obj);
         }
 
-        public override int GetHashCode() => StringComparer.Ordinal.GetHashCode(TrackInfo.Url);
+        public override int GetHashCode()
+        {
+            return StringComparer.Ordinal.GetHashCode(TrackInfo.Url);
+        }
     }
 }

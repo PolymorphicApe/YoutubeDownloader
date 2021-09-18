@@ -8,20 +8,26 @@ namespace YoutubeDownloader.Services
 {
     public class UpdateService : IDisposable
     {
+        private readonly SettingsService _settingsService;
+
         private readonly IUpdateManager _updateManager = new UpdateManager(
             new GithubPackageResolver("Tyrrrz", "YoutubeDownloader", "YoutubeDownloader.zip"),
             new ZipPackageExtractor()
         );
 
-        private readonly SettingsService _settingsService;
-
-        private Version? _updateVersion;
         private bool _updatePrepared;
         private bool _updaterLaunched;
+
+        private Version? _updateVersion;
 
         public UpdateService(SettingsService settingsService)
         {
             _settingsService = settingsService;
+        }
+
+        public void Dispose()
+        {
+            _updateManager.Dispose();
         }
 
         public async Task<Version?> CheckForUpdatesAsync()
@@ -75,7 +81,5 @@ namespace YoutubeDownloader.Services
                 // Ignore race conditions
             }
         }
-
-        public void Dispose() => _updateManager.Dispose();
     }
 }

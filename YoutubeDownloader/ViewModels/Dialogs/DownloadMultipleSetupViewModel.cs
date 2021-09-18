@@ -14,9 +14,9 @@ namespace YoutubeDownloader.ViewModels.Dialogs
 {
     public class DownloadMultipleSetupViewModel : DialogScreen<IReadOnlyList<DownloadViewModel>>
     {
-        private readonly IViewModelFactory _viewModelFactory;
-        private readonly SettingsService _settingsService;
         private readonly DialogManager _dialogManager;
+        private readonly SettingsService _settingsService;
+        private readonly IViewModelFactory _viewModelFactory;
 
         public string Title { get; set; } = default!;
 
@@ -24,7 +24,7 @@ namespace YoutubeDownloader.ViewModels.Dialogs
 
         public IReadOnlyList<IVideo> SelectedVideos { get; set; } = Array.Empty<IVideo>();
 
-        public IReadOnlyList<string> AvailableFormats { get; set; } = new[] { "mp4", "mp3", "ogg" };
+        public IReadOnlyList<string> AvailableFormats { get; set; } = new[] {"mp4", "mp3", "ogg"};
 
         public IReadOnlyList<VideoQualityPreference> AvailableQualityPreferences { get; } =
             Enum.GetValues(typeof(VideoQualityPreference)).Cast<VideoQualityPreference>().ToArray();
@@ -36,6 +36,8 @@ namespace YoutubeDownloader.ViewModels.Dialogs
         public bool IsAudioOnlyFormatSelected =>
             string.Equals(SelectedFormat, "mp3", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(SelectedFormat, "ogg", StringComparison.OrdinalIgnoreCase);
+
+        public bool CanConfirm => SelectedVideos.Any() && !string.IsNullOrWhiteSpace(SelectedFormat);
 
         public DownloadMultipleSetupViewModel(
             IViewModelFactory viewModelFactory,
@@ -51,7 +53,8 @@ namespace YoutubeDownloader.ViewModels.Dialogs
         {
             if (_settingsService.ExcludedContainerFormats is not null)
                 AvailableFormats = new[] {"mp4", "mp3", "ogg"}
-                    .Where(f => !_settingsService.ExcludedContainerFormats?.Contains(f, StringComparer.OrdinalIgnoreCase) == true)
+                    .Where(f => !_settingsService.ExcludedContainerFormats?.Contains(f,
+                        StringComparer.OrdinalIgnoreCase) == true)
                     .ToArray();
 
             SelectedFormat =
@@ -62,8 +65,6 @@ namespace YoutubeDownloader.ViewModels.Dialogs
 
             SelectedVideoQualityPreference = _settingsService.LastVideoQualityPreference;
         }
-
-        public bool CanConfirm => SelectedVideos.Any() && !string.IsNullOrWhiteSpace(SelectedFormat);
 
         public void Confirm()
         {
@@ -122,7 +123,10 @@ namespace YoutubeDownloader.ViewModels.Dialogs
             Close(downloads);
         }
 
-        public void CopyTitle() => Clipboard.SetText(Title);
+        public void CopyTitle()
+        {
+            Clipboard.SetText(Title);
+        }
     }
 
     public static class DownloadMultipleSetupViewModelExtensions
